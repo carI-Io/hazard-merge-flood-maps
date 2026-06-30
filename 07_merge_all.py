@@ -2,8 +2,9 @@
 STEP 7 — Final merge: build ispra_adb_20260630.shp
 
 This is the main new script. It combines all per-ADB processed layers into
-a single national flood hazard vector and adds the 'sourceoffl' column
-(flood source type: fluvial, seaWater, pluvial, etc.) from the ADB Po data.
+a single national flood hazard vector and adds two new columns:
+  - 'sourceoffl'  flood source type (fluvial, seaWater, pluvial, …) from ADB Po
+  - 'watercourse' name of the nearest named river (from Corpi_Idrici datasets)
 
 USAGE:
   conda activate ccpy4
@@ -22,6 +23,10 @@ PRE-REQUISITES — the following intermediate outputs must already exist.
   (which already carries the sourceoffl data as 'sourceOfFl') if the step-01
   output doesn't exist yet.
 
+  Watercourse names require the Corpi_Idrici directory:
+    D:\data\HZRD_Flood\adb_2026\Corpi_Idrici\
+  If the directory is absent the watercourse column is written as all-NULL.
+
 OUTPUT:
   D:\data\HZRD_Flood\adb_2026\ispra_adb_20260630\ispra_adb_20260630.shp
 
@@ -29,9 +34,11 @@ OUTPUT:
     rp          float   return period in years (1–500)
     adb         str     basin authority code: PO | AM | AS | AO | SI | SA | AC
     sourceoffl  str     flood source type (PO data only; NULL for other ADBs)
+    watercourse str     nearest named river within 2 km; NULL where not found
+                        (saved as 'watercours' in .shp due to 10-char limit)
     geometry    Polygon EPSG:3035
 
-  Compared to ispra_adb_20260414.shp, the new file adds 'sourceoffl'.
+  Compared to ispra_adb_20260414.shp, the new file adds 'sourceoffl' and 'watercourse'.
   'RP' is stored as lowercase 'rp' for DB consistency.
 """
 
@@ -42,6 +49,8 @@ from pathlib import Path
 import geopandas as gpd
 import pandas as pd
 
+from utils import load_watercourses, assign_watercourse
+
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s - %(levelname)s - %(message)s",
@@ -50,6 +59,9 @@ logging.basicConfig(
 
 # ── Paths ─────────────────────────────────────────────────────────────────────
 DATA_ROOT = Path(r"D:\data\HZRD_Flood\adb_2026")
+
+# Watercourse line datasets — upload Corpi_Idrici folder here before running
+CORPI_IDRICI_ROOT = DATA_ROOT / "Corpi_Idrici"
 
 # Step-01 output (dissolve + overlay from sorted_cum_prob_RP_clean inputs)
 PO_OVERLAY = DATA_ROOT / "adbpo_2026" / "adb_po_2026_overlay" / "adb_po_2026_overlay.shp"
@@ -177,7 +189,28 @@ logging.info(f"  adb distribution:\n{final['adb'].value_counts().to_string()}")
 logging.info(f"  rp range: {sorted(final['rp'].dropna().unique())}")
 logging.info(f"  sourceoffl non-null: {final['sourceoffl'].notna().sum()} / {len(final)}")
 
-# ── 7. SAVE ───────────────────────────────────────────────────────────────────
+# ── 7. WATERCOURSE NAMES ──────────────────────────────────────────────────────
+# Load all available named river line datasets from Corpi_Idrici and perform
+# a nearest-neighbour join to assign a river name to each flood polygon.
+# Polygons with purely non-fluvial source (seaWater, pluvial) are skipped.
+logging.info("Assigning watercourse names")
+if CORPI_IDRICI_ROOT.exists():
+    gdf_rivers = load_watercourses(CORPI_IDRICI_ROOT, target_crs=TARGET_CRS)
+else:
+    logging.warning(
+        f"Corpi_Idrici directory not found at {CORPI_IDRICI_ROOT}. "
+        "Copy the Corpi_Idrici folder into DATA_ROOT to enable watercourse assignment. "
+        "'watercourse' column will be NULL."
+    )
+    gdf_rivers = None
+
+final = assign_watercourse(final, gdf_rivers, max_dist_m=2000)
+logging.info(f"  watercourse non-null: {final['watercourse'].notna().sum()} / {len(final)}")
+
+# ── 8. SAVE ───────────────────────────────────────────────────────────────────
+# Column order: rp, adb, sourceoffl, watercourse, geometry
+# Note: 'watercourse' (11 chars) is saved as 'watercours' in .shp (10-char limit).
+final = final[["rp", "adb", "sourceoffl", "watercourse", "geometry"]]
 OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 final.to_file(OUTPUT_PATH)
 logging.info(f"Saved → {OUTPUT_PATH}")

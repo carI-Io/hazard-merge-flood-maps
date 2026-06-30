@@ -84,6 +84,23 @@ Used directly for SI (Sicilia), SA (Sardegna), AC (Appennino Centrale) districts
 | `04` | ADB Appennino Occidentale | Tiranti TR30/100/300 premerge shapefiles |
 | `06` | ADB Sicilia / Sardegna / App. Centrale | ISPRA national mosaic clipped to boundaries |
 
+### Watercourse datasets (Corpi_Idrici)
+
+Named river line datasets used to assign the `watercourse` column.
+Copy the `Corpi_Idrici/` folder into `DATA_ROOT` before running step 07.
+
+| Subfolder | Dataset | Name column | Coverage |
+|-----------|---------|-------------|----------|
+| `Reticolo_Idrografico/` | `Elementi_Idrici.shp` | `toponimo` | Po basin (national network) |
+| `REGIONE PIEMONTE .../` | `Tratti_idrici_Piemonte.shp` | `NOMINU10` | Full Piemonte |
+| `REGIONE_LOMBARDIA/` | `Corsi_acqua_AIPO.shp` | `NOME` | Main managed rivers (Lombardia) |
+| `REGIONE_LOMBARDIA/` | `Tratti_idrici_Lombardia.shp` | `NOME` | Full Lombardia |
+| `REGIONE VENETO .../` | `Tratti_idrici_Veneto.shp` | `NOME_CI` | Full Veneto |
+
+Not used: `Tratti_Idrici/Tratti_Idrici.shp` (641k lines, no river names in schema),
+`Corsi_acqua_RIB.shp` (drainage/irrigation canals, not flood-source rivers).
+Southern Italy (SI, SA, AC) has no watercourse data available — `watercourse` will be NULL.
+
 ### ADB Po depth rasters (PGRA 2027)
 Flood water-depth tiles for the TR500 (low-probability) scenario.
 Produced by the raster pipeline (steps 08–10).
@@ -99,9 +116,12 @@ Produced by the raster pipeline (steps 08–10).
 | `rp` | float | Return period in years (1–500) |
 | `adb` | str | District code: PO, AM, AS, AO, SI, SA, AC |
 | `sourceoffl` | str | Flood source (PO only; fluvial / seaWater / pluvial / …; NULL for other ADBs) |
+| `watercourse`\* | str | Name of nearest river within 2 km; NULL where not found or non-fluvial source |
 | `geometry` | Polygon | EPSG:3035 |
 
-New in this version vs `ispra_adb_20260414.shp`: `sourceoffl` column added.
+\* Saved as `watercours` in .shp files (10-character shapefile column name limit); full name in .gpkg.
+
+New in this version vs `ispra_adb_20260414.shp`: `sourceoffl` and `watercourse` columns added.
 
 ---
 

@@ -83,14 +83,16 @@ OUTPUT_PATH = OUTPUT_DIR / "ispra_adb_20260630.shp"
 TARGET_CRS = "EPSG:3035"
 
 
-def load_and_standardize(path, adb_code, rp_col="RP", sourceoffl_col=None):
+def load_and_standardize(path, adb_code, rp_col="RP", sourceoffl_col=None, watercourse_col=None):
     """
     Load a per-ADB overlay shapefile and return a GeoDataFrame with the
-    unified output schema: [rp, adb, sourceoffl, geometry].
+    unified output schema: [rp, adb, sourceoffl, watercourse, geometry].
 
     rp_col: name of the return-period column in the source file.
-    sourceoffl_col: if set, rename that column to 'sourceoffl'; otherwise
-      the column is added with all-NULL values (other ADBs don't carry it).
+    sourceoffl_col: if set, rename that column to 'sourceoffl'; otherwise NULL.
+    watercourse_col: if set, rename that column to 'watercourse'; otherwise NULL.
+      For ADB Po this is 'nomeelidr' (step-01 output) or 'nomeElIdr' (fallback).
+      Other ADBs leave it NULL; assign_watercourse fills them via spatial join.
 
     to_crs() reprojects the layer to the project CRS (EPSG:3035). This is
     needed because different ADB sources come in different native CRS.
@@ -109,12 +111,18 @@ def load_and_standardize(path, adb_code, rp_col="RP", sourceoffl_col=None):
     if sourceoffl_col and sourceoffl_col in gdf.columns:
         gdf = gdf.rename(columns={sourceoffl_col: "sourceoffl"})
     else:
-        # Column doesn't exist in this source — fill with NULL
         gdf["sourceoffl"] = None
+
+    if watercourse_col and watercourse_col in gdf.columns:
+        gdf = gdf.rename(columns={watercourse_col: "watercourse"})
+    else:
+        # No attribute-level river name for this source; assign_watercourse will
+        # fill these via spatial join against the Corpi_Idrici line datasets.
+        gdf["watercourse"] = None
 
     # Reproject to the shared CRS for the concatenation
     gdf = gdf.to_crs(TARGET_CRS)
-    gdf = gdf[["rp", "adb", "sourceoffl", "geometry"]]
+    gdf = gdf[["rp", "adb", "sourceoffl", "watercourse", "geometry"]]
     logging.info(f"    {len(gdf)} polygons, CRS: {gdf.crs}")
     return gdf
 
@@ -126,15 +134,25 @@ def load_and_standardize(path, adb_code, rp_col="RP", sourceoffl_col=None):
 # of sourceOfFlooding from the gpkg source) — same data, different column name.
 logging.info("ADB PO")
 if PO_OVERLAY.exists():
-    gdf_po = load_and_standardize(PO_OVERLAY, "PO", rp_col="RP", sourceoffl_col="sourceoffl")
+    # Step-01 output carries both sourceoffl and nomeelidr through the dissolve+overlay
+    gdf_po = load_and_standardize(
+        PO_OVERLAY, "PO", rp_col="RP",
+        sourceoffl_col="sourceoffl",
+        watercourse_col="nomeelidr",
+    )
 else:
     logging.warning(
         f"Step-01 output not found at {PO_OVERLAY}. "
-        "Falling back to AA_pda2025_H_M_L with sourceOfFl column. "
+        "Falling back to AA_pda2025_H_M_L. "
         "Run 01_adb_po_overlay.py to regenerate from source data."
     )
-    # AA_pda2025_H_M_L.shp stores sourceOfFlooding as 'sourceOfFl' (shapefile 10-char limit)
-    gdf_po = load_and_standardize(PO_FALLBACK, "PO", rp_col="RP", sourceoffl_col="sourceOfFl")
+    # AA_pda2025_H_M_L.shp truncates column names to 10 chars (shapefile limit):
+    #   sourceOfFlooding → sourceOfFl,  nomeElementoIdrografico → nomeElIdr
+    gdf_po = load_and_standardize(
+        PO_FALLBACK, "PO", rp_col="RP",
+        sourceoffl_col="sourceOfFl",
+        watercourse_col="nomeElIdr",
+    )
 
 # ── 2. ADB AM ─────────────────────────────────────────────────────────────────
 logging.info("ADB AM")
@@ -162,8 +180,9 @@ def load_ispra_district(path):
     if "RP" in gdf.columns and "rp" not in gdf.columns:
         gdf = gdf.rename(columns={"RP": "rp"})
     gdf["sourceoffl"] = None
+    gdf["watercourse"] = None  # filled by assign_watercourse via spatial join
     gdf = gdf.to_crs(TARGET_CRS)
-    return gdf[["rp", "adb", "sourceoffl", "geometry"]]
+    return gdf[["rp", "adb", "sourceoffl", "watercourse", "geometry"]]
 
 gdf_si = load_ispra_district(SI_PATH)
 logging.info(f"  SI: {len(gdf_si)} polygons")
@@ -188,6 +207,7 @@ logging.info(f"Total: {len(final)} polygons")
 logging.info(f"  adb distribution:\n{final['adb'].value_counts().to_string()}")
 logging.info(f"  rp range: {sorted(final['rp'].dropna().unique())}")
 logging.info(f"  sourceoffl non-null: {final['sourceoffl'].notna().sum()} / {len(final)}")
+logging.info(f"  watercourse pre-filled (from nomeelidr): {final['watercourse'].notna().sum()} / {len(final)}")
 
 # ── 7. WATERCOURSE NAMES ──────────────────────────────────────────────────────
 # Load all available named river line datasets from Corpi_Idrici and perform

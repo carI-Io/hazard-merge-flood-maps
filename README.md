@@ -116,10 +116,20 @@ Produced by the raster pipeline (steps 08–10).
 | `rp` | float | Return period in years (1–500) |
 | `adb` | str | District code: PO, AM, AS, AO, SI, SA, AC |
 | `sourceoffl` | str | Flood source (PO only; fluvial / seaWater / pluvial / …; NULL for other ADBs) |
-| `watercourse`\* | str | Name of nearest river within 2 km; NULL where not found or non-fluvial source |
+| `watercourse`\* | str | Name of the associated watercourse; NULL where not determinable |
 | `geometry` | Polygon | EPSG:3035 |
 
 \* Saved as `watercours` in .shp files (10-character shapefile column name limit); full name in .gpkg.
+
+**Watercourse assignment (two-tier)**:
+1. **ADB Po — attribute-based (exact)**: each ADB Po source shapefile carries a `nomeelidr` column
+   (EU Flood Directive field `nomeElementoIdrografico`) with the official hydrographic element name,
+   e.g. `"Fiume Taro"`, `"Lago di Garda"`, `"Mare Adriatico"`. This is carried through the dissolve
+   and overlay in step 01, then used directly in step 07. No spatial proximity involved.
+2. **Other ADBs — spatial proximity (best-effort)**: for districts without embedded river names,
+   a nearest-neighbour join (`sjoin_nearest`) against the Corpi_Idrici line datasets assigns the
+   closest named river within 2 km. Coverage is limited to the datasets available (Po basin,
+   Piemonte, Lombardia, Veneto); other districts may receive NULL.
 
 New in this version vs `ispra_adb_20260414.shp`: `sourceoffl` and `watercourse` columns added.
 

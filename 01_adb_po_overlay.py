@@ -12,11 +12,13 @@ INPUTS (Windows local paths — adjust DATA_ROOT if running on Linux server):
 
   Each file has columns: fid, competenta, nomeelidr, sourceoffl, returnnperi, legenda, RP, geometry
   RP is already a numeric return period (float).
+  nomeelidr is the official name of the hydrographic element (river, lake, etc.) — populated
+    directly from the EU Flood Directive reporting data, per polygon.
   sourceoffl encodes the flood source (fluvial, seaWater, pluvial, etc.); ~2–5 % of rows are filled.
 
 OUTPUT:
   <DATA_ROOT>/adbpo_2026/adb_po_2026_overlay/adb_po_2026_overlay.shp
-  Columns: RP (float), sourceoffl (str | None), geometry
+  Columns: RP (float), sourceoffl (str | None), nomeelidr (str | None), geometry
 
 NEXT STEP: run 07_merge_all.py
 """
@@ -56,8 +58,11 @@ gdfs = {}
 for level, path in INPUTS.items():
     gdf = gpd.read_file(path)
     gdf["geometry"] = gdf.geometry.buffer(0)
-    # Keep only the columns we need for the rest of the pipeline
-    gdf = gdf[["RP", "sourceoffl", "geometry"]].copy()
+    # Keep RP, the two attribute columns, and geometry.
+    # nomeelidr (nome elemento idrografico) = the official river/lake name per polygon,
+    # as reported under the EU Flood Directive. It is carried through dissolve and
+    # overlay so the final output has per-polygon river attribution.
+    gdf = gdf[["RP", "sourceoffl", "nomeelidr", "geometry"]].copy()
     gdfs[level] = gdf
     logging.info(f"  {level}: {len(gdf)} polygons, RP range {sorted(gdf['RP'].dropna().unique())}")
 
@@ -69,15 +74,15 @@ for level, path in INPUTS.items():
 # carries the flood-source attribute through: the first non-null value in each
 # merged component is used (most tiles have NULL; filled values are kept).
 logging.info("Dissolving PO H")
-gdf_H_diss = dissolve_touching_by_rp(gdfs["H"], extra_cols=["sourceoffl"])
+gdf_H_diss = dissolve_touching_by_rp(gdfs["H"], extra_cols=["sourceoffl", "nomeelidr"])
 logging.info(f"  H dissolved: {len(gdf_H_diss)} polygons")
 
 logging.info("Dissolving PO M")
-gdf_M_diss = dissolve_touching_by_rp(gdfs["M"], extra_cols=["sourceoffl"])
+gdf_M_diss = dissolve_touching_by_rp(gdfs["M"], extra_cols=["sourceoffl", "nomeelidr"])
 logging.info(f"  M dissolved: {len(gdf_M_diss)} polygons")
 
 logging.info("Dissolving PO L")
-gdf_L_diss = dissolve_touching_by_rp(gdfs["L"], extra_cols=["sourceoffl"])
+gdf_L_diss = dissolve_touching_by_rp(gdfs["L"], extra_cols=["sourceoffl", "nomeelidr"])
 logging.info(f"  L dissolved: {len(gdf_L_diss)} polygons")
 
 # ── 3. HIERARCHICAL OVERLAY ───────────────────────────────────────────────────
@@ -90,12 +95,12 @@ final = hierarchical_overlay(
     gdf_H_diss,
     gdf_M_diss,
     gdf_L_diss,
-    schema_cols=["RP", "sourceoffl"],
+    schema_cols=["RP", "sourceoffl", "nomeelidr"],
 )
 logging.info(f"Overlay done: {len(final)} polygons")
 
 # ── 4. SAVE ───────────────────────────────────────────────────────────────────
 OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 out_path = OUTPUT_DIR / "adb_po_2026_overlay.shp"
-final[["RP", "sourceoffl", "geometry"]].to_file(out_path)
+final[["RP", "sourceoffl", "nomeelidr", "geometry"]].to_file(out_path)
 logging.info(f"Saved → {out_path}")

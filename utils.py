@@ -274,7 +274,8 @@ def assign_watercourse(gdf_flood, gdf_rivers, max_dist_m=2000):
     shapefile limit); in GeoPackage the full name is preserved.
     """
     gdf_flood = gdf_flood.copy()
-    gdf_flood["watercourse"] = None
+    if "watercourse" not in gdf_flood.columns:
+        gdf_flood["watercourse"] = None
 
     if gdf_rivers is None or len(gdf_rivers) == 0:
         logging.warning("No river data available; 'watercourse' will be NULL for all rows.")
@@ -293,7 +294,12 @@ def assign_watercourse(gdf_flood, gdf_rivers, max_dist_m=2000):
             return False
         return True
 
-    eligible_mask = gdf_flood["sourceoffl"].apply(_is_eligible)
+    # Only spatial-join rows that (a) have a fluvial source AND (b) don't already
+    # have a watercourse name set from a source attribute (e.g. nomeelidr for PO)
+    eligible_mask = (
+        gdf_flood["sourceoffl"].apply(_is_eligible)
+        & gdf_flood["watercourse"].isna()
+    )
     eligible = gdf_flood[eligible_mask]
 
     if len(eligible) == 0:
@@ -321,10 +327,14 @@ def assign_watercourse(gdf_flood, gdf_rivers, max_dist_m=2000):
 
     gdf_flood.loc[eligible.index, "watercourse"] = river_names.values
 
-    n_assigned = gdf_flood["watercourse"].notna().sum()
-    n_eligible = eligible_mask.sum()
+    n_total = gdf_flood["watercourse"].notna().sum()
+    n_from_spatial = (
+        gdf_flood.loc[eligible.index, "watercourse"].notna().sum()
+        if len(eligible) > 0 else 0
+    )
+    n_pre_filled = n_total - n_from_spatial
     logging.info(
-        f"  watercourse assigned: {n_assigned:,} / {n_eligible:,} eligible "
-        f"({len(gdf_flood) - n_eligible:,} skipped as non-fluvial)"
+        f"  watercourse total: {n_total:,} filled "
+        f"({n_pre_filled:,} from source attribute, {n_from_spatial:,} from spatial join)"
     )
     return gdf_flood

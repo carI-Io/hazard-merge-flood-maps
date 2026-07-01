@@ -33,15 +33,15 @@ logging.basicConfig(
 )
 
 # ── Paths ─────────────────────────────────────────────────────────────────────
-DATA_ROOT = Path(r"D:\data\HZRD_Flood\adb_2026")
+SERVER_ROOT = Path("/home/admin_climatecharted_com/data/flood_Adb_ispra/ISPRA")
 
 INPUT = (
-    DATA_ROOT
+    SERVER_ROOT
     / "adbas_2026"
     / "PIANIFICAZIONE_SIT_PGRA_ITC_FLUVIAL_cum_prob_RP"
     / "PIANIFICAZIONE_SIT_PGRA_ITC_FLUVIAL_cum_prob_RP.shp"
 )
-OUTPUT_DIR = DATA_ROOT / "ADB-AS_2026_merge_RP_overlay"
+OUTPUT_DIR = SERVER_ROOT / "ADB-AS_2026_merge_RP_overlay"
 
 # ── 1. LOAD ───────────────────────────────────────────────────────────────────
 logging.info("Loading ADB AS")

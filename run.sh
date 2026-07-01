@@ -33,6 +33,9 @@ conda activate ccpy4
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 cd "$SCRIPT_DIR"
 
+LOG_FILE="./exec_output_$(date +%Y%m%d_%H%M%S).txt"
+mkdir -p "$(dirname "$LOG_FILE")"
+
 # -- Step 1: ADB Po -----------------------------------------------------------
 echo "[$(date '+%H:%M:%S')] Step 1 — ADB Po overlay (with sourceoffl)"
 python 01_adb_po_overlay.py
@@ -47,18 +50,18 @@ python 03_adb_as_overlay.py
 
 # -- Step 4: ADB AO (server only) ---------------------------------------------
 # Uncomment to reprocess from raw Tiranti files on server.
-# echo "[$(date '+%H:%M:%S')] Step 4 — ADB AO overlay"
-# python 04_adb_ao_overlay.py
+echo "[$(date '+%H:%M:%S')] Step 4 — ADB AO overlay"
+python 04_adb_ao_overlay.py
 
 # -- Step 5: ISPRA overlay (server only) --------------------------------------
 # Uncomment to reprocess from raw ISPRA premerge files on server.
-# echo "[$(date '+%H:%M:%S')] Step 5 — ISPRA overlay"
-# python 05_ispra_overlay.py
+echo "[$(date '+%H:%M:%S')] Step 5 — ISPRA overlay"
+python 05_ispra_overlay.py
 
 # -- Step 6: ISPRA → SI/SA/AC (server only) -----------------------------------
 # Uncomment to reprocess ISPRA district clips on server.
-# echo "[$(date '+%H:%M:%S')] Step 6 — ISPRA district clip"
-# python 06_ispra_adb_si_sa_ac.py
+echo "[$(date '+%H:%M:%S')] Step 6 — ISPRA district clip"
+python 06_ispra_adb_si_sa_ac.py
 
 # -- Step 7: Final merge → ispra_adb_20260630.shp ----------------------------
 echo "[$(date '+%H:%M:%S')] Step 7 — Final merge"

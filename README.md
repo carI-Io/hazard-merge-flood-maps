@@ -48,6 +48,7 @@ python 07_merge_all.py          # ~2 min
 ```
 
 Or use `run.sh` on the server to run everything in sequence.
+{ time ./run.sh; }
 
 ### Raster pipeline — build depth GeoTIFF
 

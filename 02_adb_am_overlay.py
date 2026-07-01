@@ -33,11 +33,12 @@ logging.basicConfig(
 )
 
 # ── Paths ─────────────────────────────────────────────────────────────────────
-DATA_ROOT = Path(r"D:\data\HZRD_Flood\adb_2026")
+# DATA_ROOT = Path(r"D:\data\HZRD_Flood\adb_2026")
+DATA_ROOT = Path("/home/admin_climatecharted_com/data/flood_adb_ispra/ADB")
 
 INPUT = (
     DATA_ROOT
-    / "adbam_2026"
+    / "adb_am_2026"
     / "ADB-AM_2026_merge_cum_prob_RP"
     / "ADB-AM_2026_merge_cum_prob_RP.shp"
 )

@@ -39,7 +39,7 @@ logging.basicConfig(
 
 # ── Paths ─────────────────────────────────────────────────────────────────────
 # Server-side Linux paths for the raw Tiranti premerge files
-SERVER_ROOT = Path("/home/admin_climatecharted_com/data/ADB/adb_ao")
+SERVER_ROOT = Path("/home/admin_climatecharted_com/data/flood_Adb_ispra/ADB/adb_ao")
 
 INPUTS = {
     "H": SERVER_ROOT / "Tiranti_TR30_HPH_premerge" / "Tiranti_TR30_HPH_premerge.shp",

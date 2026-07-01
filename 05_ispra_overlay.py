@@ -44,7 +44,7 @@ logging.basicConfig(
 )
 
 # ── Paths ─────────────────────────────────────────────────────────────────────
-SERVER_ROOT = Path("/home/admin_climatecharted_com/data/ISPRA")
+SERVER_ROOT = Path("/home/admin_climatecharted_com/data/flood_Adb_ispra/ISPRA")
 
 INPUTS = {
     "H": SERVER_ROOT / "HPH_Mosaicatura_ISPRA_2020_premerge" / "HPH_Mosaicatura_ISPRA_2020_premerge.shp",

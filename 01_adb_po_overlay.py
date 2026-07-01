@@ -39,7 +39,8 @@ logging.basicConfig(
 
 # ── Paths ─────────────────────────────────────────────────────────────────────
 # Change DATA_ROOT to match the server path when running remotely.
-DATA_ROOT = Path(r"D:\data\HZRD_Flood\adb_2026\adbpo_2026")
+# DATA_ROOT = Path(r"D:\data\HZRD_Flood\adb_2026\adbpo_2026")
+DATA_ROOT = Path(r"/home/admin_climatecharted_com/data/flood_adb_ispra/ADB/adb_po_2026")
 
 INPUTS = {
     "H": DATA_ROOT / "adb_po_2026_H_sorted_cum_prob_RP_clean" / "adb_po_2026_H_sorted_cum_prob_RP_clean.shp",

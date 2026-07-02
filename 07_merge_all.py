@@ -58,27 +58,27 @@ logging.basicConfig(
 )
 
 # ── Paths ─────────────────────────────────────────────────────────────────────
-DATA_ROOT = Path(r"D:\data\HZRD_Flood\adb_2026")
+DATA_ROOT = Path(r"/home/admin_climatecharted_com/data/flood_adb_ispra")
 
 # Watercourse line datasets — upload Corpi_Idrici folder here before running
 CORPI_IDRICI_ROOT = DATA_ROOT / "Corpi_Idrici"
 
 # Step-01 output (dissolve + overlay from sorted_cum_prob_RP_clean inputs)
-PO_OVERLAY = DATA_ROOT / "adbpo_2026" / "adb_po_2026_overlay" / "adb_po_2026_overlay.shp"
+PO_OVERLAY = DATA_ROOT / "ADB" / "adb_po_2026" / "adb_po_2026_overlay" / "adb_po_2026_overlay_20260702.shp"
 
 # Fallback: pre-built PO overlay that already has sourceOfFl (but column named differently)
-PO_FALLBACK = DATA_ROOT / "AA_pda2025" / "AA_pda2025_H_M_L" / "AA_pda2025_H_M_L.shp"
+PO_FALLBACK = DATA_ROOT / "ADB" / "AA_pda2025" / "AA_pda2025_H_M_L" / "AA_pda2025_H_M_L.shp"
 
-AM_PATH = DATA_ROOT / "ADB-AM_2026_merge_RP_overlay" / "ADB-AM_2026_merge_RP_overlay.shp"
-AS_PATH = DATA_ROOT / "ADB-AS_2026_merge_RP_overlay" / "ADB-AS_2026_merge_RP_overlay.shp"
-AO_PATH = DATA_ROOT / "ADB_AO_Tiranti" / "ADB_AO_Tiranti.shp"
+AM_PATH = DATA_ROOT / "ADB" / "adb_am_2026" / "ADB-AM_2026_merge_RP_overlay" / "ADB-AM_2026_merge_RP_overlay.shp"
+AS_PATH = DATA_ROOT / "ADB" / "adb_as_2026" / "ADB-AS_2026_merge_RP_overlay" / "ADB-AS_2026_merge_RP_overlay.shp"
+AO_PATH = DATA_ROOT / "ADB" / "adb_ao" / "ADB_AO_Tiranti" / "ADB_AO_Tiranti.shp"
 
-SI_PATH = DATA_ROOT / "ispra_adbsi" / "ispra_adbsi.shp"
-SA_PATH = DATA_ROOT / "ispra_adbsa" / "ispra_adbsa.shp"
-AC_PATH = DATA_ROOT / "ispra_adbac" / "ispra_adbac.shp"
+SI_PATH = DATA_ROOT / "ADB" / "ispra_adbsi" / "ispra_adbsi.shp"
+SA_PATH = DATA_ROOT / "ADB" / "ispra_adbsa" / "ispra_adbsa.shp"
+AC_PATH = DATA_ROOT / "ADB" / "ispra_adbac" / "ispra_adbac.shp"
 
-OUTPUT_DIR = DATA_ROOT / "ispra_adb_20260630"
-OUTPUT_PATH = OUTPUT_DIR / "ispra_adb_20260630.shp"
+OUTPUT_DIR = DATA_ROOT / "ADB" / "adb_ispra_merge_20260702"
+OUTPUT_PATH = OUTPUT_DIR / "adb_ispra_merge_20260702.shp"
 
 TARGET_CRS = "EPSG:3035"
 

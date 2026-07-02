@@ -40,15 +40,15 @@ logging.basicConfig(
 # ── Paths ─────────────────────────────────────────────────────────────────────
 # Change DATA_ROOT to match the server path when running remotely.
 # DATA_ROOT = Path(r"D:\data\HZRD_Flood\adb_2026\adbpo_2026")
-DATA_ROOT = Path(r"/home/admin_climatecharted_com/data/flood_adb_ispra/ADB/adb_po_2026")
+DATA_ROOT = Path(r"/home/admin_climatecharted_com/data/flood_adb_ispra")
 
 INPUTS = {
-    "H": DATA_ROOT / "adb_po_2026_H_sorted_cum_prob_RP_clean" / "adb_po_2026_H_sorted_cum_prob_RP_clean.shp",
-    "M": DATA_ROOT / "adb_po_2026_M_sorted_cum_prob_RP_clean" / "adb_po_2026_M_sorted_cum_prob_RP_clean.shp",
-    "L": DATA_ROOT / "adb_po_2026_L_sorted_cum_prob_RP_clean" / "adb_po_2026_L_sorted_cum_prob_RP_clean.shp",
+    "H": DATA_ROOT / "ADB/adb_po_2026/adb_po_2026_H_sorted_cum_prob_RP_clean" / "adb_po_2026_H_sorted_cum_prob_RP_clean.shp",
+    "M": DATA_ROOT / "ADB/adb_po_2026/adb_po_2026_M_sorted_cum_prob_RP_clean" / "adb_po_2026_M_sorted_cum_prob_RP_clean.shp",
+    "L": DATA_ROOT / "ADB/adb_po_2026/adb_po_2026_L_sorted_cum_prob_RP_clean" / "adb_po_2026_L_sorted_cum_prob_RP_clean.shp",
 }
 
-OUTPUT_DIR = DATA_ROOT / "adb_po_2026_overlay"
+OUTPUT_DIR = DATA_ROOT / "ADB/adb_po_2026/adb_po_2026_overlay_20260702"
 
 # ── 1. LOAD ───────────────────────────────────────────────────────────────────
 # gpd.read_file reads a vector file into a GeoDataFrame (a pandas DataFrame

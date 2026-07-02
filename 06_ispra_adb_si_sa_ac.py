@@ -50,24 +50,24 @@ logging.basicConfig(
 )
 
 # ── Paths ─────────────────────────────────────────────────────────────────────
-SERVER_ROOT = Path("/home/admin_climatecharted_com/data")
+DATA_ROOT = Path("/home/admin_climatecharted_com/data/flood_adb_ispra")
 
 ISPRA_INPUTS = {
-    "H": SERVER_ROOT / "ISPRA/HPH_Mosaicatura_ISPRA_2020_premerge/HPH_Mosaicatura_ISPRA_2020_premerge.shp",
-    "M": SERVER_ROOT / "ISPRA/MPH_Mosaicatura_ISPRA_2020_premerge/MPH_Mosaicatura_ISPRA_2020_premerge.shp",
-    "L": SERVER_ROOT / "ISPRA/LPH_Mosaicatura_ISPRA_2020_premerge/LPH_Mosaicatura_ISPRA_2020_premerge.shp",
+    "H": DATA_ROOT / "ISPRA/HPH_Mosaicatura_ISPRA_2020_premerge/HPH_Mosaicatura_ISPRA_2020_premerge.shp",
+    "M": DATA_ROOT / "ISPRA/MPH_Mosaicatura_ISPRA_2020_premerge/MPH_Mosaicatura_ISPRA_2020_premerge.shp",
+    "L": DATA_ROOT / "ISPRA/LPH_Mosaicatura_ISPRA_2020_premerge/LPH_Mosaicatura_ISPRA_2020_premerge.shp",
 }
 
 # Standard RP values assigned to ISPRA H/M/L classes for SI/SA/AC districts
 RP_MAP = {"H": 20, "M": 100, "L": 200}
 
 DISTRICTS = {
-    "SI": SERVER_ROOT / "ADB/delimitazione_distretto_ADB_Sicilia/delimitazione_distretto_ADB_Sicilia.shp",
-    "SA": SERVER_ROOT / "ADB/delimitazione_distretto_ADB_Sardegna/delimitazione_distretto_ADB_Sardegna.shp",
-    "AC": SERVER_ROOT / "ADB/delimitazione_distretto_ADB_App_Centrale/delimitazione_distretto_ADB_App_Centrale.shp",
+    "SI": DATA_ROOT / "ADB/delimitazione_distretto_ADB_Sicilia/delimitazione_distretto_ADB_Sicilia.shp",
+    "SA": DATA_ROOT / "ADB/delimitazione_distretto_ADB_Sardegna/delimitazione_distretto_ADB_Sardegna.shp",
+    "AC": DATA_ROOT / "ADB/delimitazione_distretto_ADB_App_Centrale/delimitazione_distretto_ADB_App_Centrale.shp",
 }
 
-OUTPUT_ROOT = SERVER_ROOT / "ADB"
+OUTPUT_ROOT = DATA_ROOT / "ADB"
 
 
 def process_district(delim_gdf, ispra_gdfs, adb_name):

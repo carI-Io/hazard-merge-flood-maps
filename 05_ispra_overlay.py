@@ -44,15 +44,15 @@ logging.basicConfig(
 )
 
 # ── Paths ─────────────────────────────────────────────────────────────────────
-SERVER_ROOT = Path("/home/admin_climatecharted_com/data/flood_Adb_ispra/ISPRA")
+DATA_ROOT = Path("/home/admin_climatecharted_com/data/flood_adb_ispra")
 
 INPUTS = {
-    "H": SERVER_ROOT / "HPH_Mosaicatura_ISPRA_2020_premerge" / "HPH_Mosaicatura_ISPRA_2020_premerge.shp",
-    "M": SERVER_ROOT / "MPH_Mosaicatura_ISPRA_2020_premerge" / "MPH_Mosaicatura_ISPRA_2020_premerge.shp",
-    "L": SERVER_ROOT / "LPH_Mosaicatura_ISPRA_2020_premerge" / "LPH_Mosaicatura_ISPRA_2020_premerge.shp",
+    "H": DATA_ROOT / "ISPRA/HPH_Mosaicatura_ISPRA_2020_premerge" / "HPH_Mosaicatura_ISPRA_2020_premerge.shp",
+    "M": DATA_ROOT / "ISPRA/MPH_Mosaicatura_ISPRA_2020_premerge" / "MPH_Mosaicatura_ISPRA_2020_premerge.shp",
+    "L": DATA_ROOT / "ISPRA/LPH_Mosaicatura_ISPRA_2020_premerge" / "LPH_Mosaicatura_ISPRA_2020_premerge.shp",
 }
 
-OUTPUT_DIR = SERVER_ROOT / "HPH_Mosaicatura_ISPRA_2020_H_M_L"
+OUTPUT_DIR = DATA_ROOT / "ISPRA/HPH_Mosaicatura_ISPRA_2020_H_M_L"
 
 
 def fast_difference(A, B):

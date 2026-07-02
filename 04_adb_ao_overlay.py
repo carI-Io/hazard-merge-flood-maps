@@ -39,18 +39,18 @@ logging.basicConfig(
 
 # ── Paths ─────────────────────────────────────────────────────────────────────
 # Server-side Linux paths for the raw Tiranti premerge files
-SERVER_ROOT = Path("/home/admin_climatecharted_com/data/flood_Adb_ispra/ADB/adb_ao")
+DATA_ROOT = Path("/home/admin_climatecharted_com/data/flood_adb_ispra")
 
 INPUTS = {
-    "H": SERVER_ROOT / "Tiranti_TR30_HPH_premerge" / "Tiranti_TR30_HPH_premerge.shp",
-    "M": SERVER_ROOT / "Tiranti_TR100_MPH_premerge" / "Tiranti_TR100_MPH_premerge.shp",
-    "L": SERVER_ROOT / "Tiranti_TR300_LPH_premerge" / "Tiranti_TR300_LPH_premerge.shp",
+    "H": DATA_ROOT / "ADB/adb_ao/Tiranti_TR30_HPH_premerge" / "Tiranti_TR30_HPH_premerge.shp",
+    "M": DATA_ROOT / "ADB/adb_ao/Tiranti_TR100_MPH_premerge" / "Tiranti_TR100_MPH_premerge.shp",
+    "L": DATA_ROOT / "ADB/adb_ao/Tiranti_TR300_LPH_premerge" / "Tiranti_TR300_LPH_premerge.shp",
 }
 
 # Return periods corresponding to the Tiranti scenarios
 RP_MAP = {"H": 30, "M": 100, "L": 300}
 
-OUTPUT_DIR = Path("/home/admin_climatecharted_com/data/ADB/adb_ao/ADB_AO_Tiranti")
+OUTPUT_DIR = Path("/home/admin_climatecharted_com/data/flood_adb_ispra/ADB/adb_ao/ADB_AO_Tiranti")
 
 # ── 1. LOAD & ASSIGN RP ──────────────────────────────────────────────────────
 # The Tiranti shapefiles don't carry a return-period attribute; the RP is
